@@ -183,7 +183,7 @@ model Comment {
   // foreign key linking to the user model
   userId   String 
 
-  // optional foreign key linking to the parent comment (for nested replies)
+  // optional foreign key linking to the parent comment (for nested comments)
   parentId String? 
 
   // timestamp when the comment was created

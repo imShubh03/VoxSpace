@@ -1,6 +1,7 @@
 import { Input } from "@/components/ui/input";
 import { Search } from "lucide-react";
 import AuthHeader from "./auth-header"; // Ensure the correct filename
+import SearchInput from "./serach-input";
 
 const Header = () => {
     return (
@@ -11,7 +12,8 @@ const Header = () => {
                     <h1 className="text-2xl font-bold text-primary">VoxSpace</h1>
                     <div className="relative hidden sm:block">
                         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                        <Input type="text" placeholder="Search posts" className="pl-8 w-[300px]" />
+                        
+                        <SearchInput/>
                     </div>
                 </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useSession, signIn, signOut } from "next-auth/react";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Search } from "lucide-react";
 import { Avatar, AvatarImage, AvatarFallback } from "./ui/avatar";
@@ -10,6 +10,14 @@ import MobileMenu from "./MobileMenu";
 const AuthHeader = () => {
     const { data: session } = useSession();
     const user = session?.user;
+
+    const [mounted, setMounted] = useState(false);
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null; 
 
     return (
         <div className="flex items-center space-x-4">

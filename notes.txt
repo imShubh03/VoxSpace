@@ -16,3 +16,21 @@ Why split into two files?
 ✅ We import AuthHeader.tsx into Header.tsx, keeping the structure clean and optimized.
 
 This way, we get the best of both worlds—fast server-side rendering and working authentication. 🚀
+
+
+
+//ROUTES
+
+topic/[]  => topic/javascript, topic/python
+
+topic/[slug]/posts => 
+
+topic/[slug]/posts/[postId]
+
+topic/[slug]/posts/new
+
+
+topic/[] to get value in []
+type topicShowPageParams = {
+    params:Promise<{slug:string}>
+}
