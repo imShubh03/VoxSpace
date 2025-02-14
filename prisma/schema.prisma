@@ -1,0 +1,206 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// defines the account model for authentication
+model Account {
+  // unique identifier for each account
+  id                  String @id @default(cuid()) 
+  // foreign key linking to the user model
+  userId              String 
+  // type of authentication (oauth, email, etc.)
+  type                String
+  // name of the authentication provider (google, github, etc.)
+  provider            String
+  // unique identifier assigned by the provider  
+  providerAccountId   String  
+  // optional refresh token for oauth authentication
+  refresh_token       String?
+  // optional access token for authentication
+  access_token        String?
+  // expiration time of the access token
+  expires_at          Int?
+  // type of access token (e.g., bearer)
+  token_type          String?
+  // scopes granted to the access token
+  scope               String?
+  // id token for authentication (if provided)
+  id_token            String?
+  // session state information
+  session_state       String?
+
+  // defines the relationship with the user model
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // ensures provider and provider account id are unique together
+  @@unique([provider, providerAccountId])
+}
+
+
+
+// defines the user model to store user details
+model User {
+  // unique identifier for each user
+  id                String @id @default(cuid()) 
+  // optional name of the user
+  name              String? 
+  // optional email of the user, must be unique
+  email             String?   @unique 
+  // timestamp when the email was verified
+  emailVerified     DateTime? 
+  // optional profile image of the user
+  image             String? 
+  // relationship with the account model (one user can have multiple accounts)
+  accounts          Account[] 
+  // relationship with the session model (one user can have multiple sessions)
+  sessions          Session[] 
+  // relationship with the post model (one user can create multiple posts)
+  Post              Post[] 
+  // relationship with the comment model (one user can write multiple comments)
+  Comment           Comment[] 
+}
+
+
+
+// defines the session model to manage user sessions
+model Session {
+
+  // unique identifier for each session
+  id           String   @id @default(cuid()) 
+
+  // unique session token for authentication
+  sessionToken String   @unique 
+
+  // foreign key linking to the user model
+  userId       String 
+
+  // expiration time of the session
+  expires      DateTime 
+
+  // defines the relationship with the user model
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade) 
+}
+
+
+
+// defines the verification token model for email verification and password reset
+model VerificationToken {
+
+  // unique identifier for the token (usually email or user id)
+  identifier String 
+
+  // unique token used for verification
+  token      String   @unique 
+
+  // expiration time of the token
+  expires    DateTime 
+
+  // ensures that the combination of identifier and token is unique
+  @@unique([identifier, token]) 
+}
+
+
+// defines the topic model to categorize discussions
+
+model Topic {
+
+  // unique identifier for each topic
+  id          String @id @default(cuid()) 
+
+  // unique slug for the topic, used in urls
+  slug        String @unique 
+
+  // description of the topic
+  description String 
+
+  // relationship with the post model (one topic can have multiple posts)
+  posts       Post[] 
+
+  // timestamp when the topic was created
+  createdAt   DateTime @default(now()) 
+
+  // timestamp when the topic was last updated
+  updatedAt   DateTime @updatedAt 
+}
+
+
+// defines the post model to store discussion posts
+model Post {
+
+  // unique identifier for each post
+  id      String @id @default(cuid()) 
+
+  // title of the post
+  title   String 
+
+  // content of the post
+  content String 
+
+  // foreign key linking to the user model
+  userId  String 
+
+  // foreign key linking to the topic model
+  topicId String 
+
+  // timestamp when the post was created
+  createdAt DateTime @default(now()) 
+
+  // timestamp when the post was last updated
+  updatedAt DateTime @updatedAt 
+
+  // defines the relationship with the user model (each post belongs to one user)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade) 
+
+  // defines the relationship with the topic model (each post belongs to one topic)
+  topic    Topic     @relation(fields: [topicId], references: [id]) 
+
+  // relationship with the comment model (one post can have multiple comments)
+  comments Comment[] 
+}
+
+
+// defines the comment model to store comments on posts
+
+model Comment {
+
+  // unique identifier for each comment
+  id       String  @id @default(cuid()) 
+
+  // content of the comment
+  content  String 
+
+  // foreign key linking to the post model
+  postId   String 
+
+  // foreign key linking to the user model
+  userId   String 
+
+  // optional foreign key linking to the parent comment (for nested replies)
+  parentId String? 
+
+  // timestamp when the comment was created
+  createdAt DateTime @default(now()) 
+
+  // timestamp when the comment was last updated
+  updatedAt DateTime @updatedAt 
+
+  // defines the relationship with the parent comment (nullable for top-level comments)
+  parent   Comment?  @relation("Comments", fields: [parentId], references: [id], onDelete: Cascade) 
+
+  // defines the relationship with the post model (each comment belongs to one post)
+  post     Post      @relation(fields: [postId], references: [id], onDelete: Cascade) 
+
+  // defines the relationship with the user model (each comment belongs to one user)
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade) 
+
+  // defines the relationship for nested comments (a comment can have multiple replies)
+  children Comment[] @relation("Comments") 
+}

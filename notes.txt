@@ -1,0 +1,18 @@
+
+
+We separated AuthHeader.tsx into a different file because useSession() is a React Hook, and Hooks can only be used inside Client Components.
+
+Why was Header.tsx originally a Server Component?
+It used await auth(), which runs on the server and fetches session data using cookies.
+Since auth() is an async function, it can only be used in a Server Component.
+Header.tsx didn’t have 'use client', so by default, it was a Server Component.
+Issue with keeping everything in one file (Header.tsx)
+useSession() works only in Client Components.
+If we used useSession() inside Header.tsx, we had to make the entire Header.tsx a Client Component ('use client').
+Problem? Making Header.tsx a Client Component reduces performance and disables server-side optimizations.
+Why split into two files?
+✅ Header.tsx stays a Server Component for fast, efficient rendering.
+✅ AuthHeader.tsx becomes a Client Component, handling authentication logic (useSession()).
+✅ We import AuthHeader.tsx into Header.tsx, keeping the structure clean and optimized.
+
+This way, we get the best of both worlds—fast server-side rendering and working authentication. 🚀
